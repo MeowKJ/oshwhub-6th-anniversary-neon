@@ -45,9 +45,9 @@
 │                      # 原理图、PCB、物料清单、Gerber 文件
 ├── firmware/          # Arduino/ESP32-C3 source code
 │                      # Arduino/ESP32-C3 固件源码
-├── enclosure/         # Enclosure designs (laser cutting/3D printing)
-│                      # 外壳设计（激光切割/3D 打印）
-└── docs/              # Design notes, debugging & 
+├── enclosure/         # Enclosure designs
+│                      # 外壳设计
+└── docs/              # Design notes, debugging
 ```
 
 ---
@@ -91,13 +91,12 @@ The default color scheme replicates the OSHWHub logo:
 - Orange (橙)
 - Green-White (绿白)
 
-You can modify colors by replacing LED strips or adjusting PWM values in firmware.
+You can modify colors by replacing LED strips.
 
 ### Animation Patterns | 动画模式
 Edit `firmware/` to add custom lighting sequences:
 - Sequential character illumination
 - Breathing effects
-- Color transitions
 - Random sparkle patterns
 
 ---
