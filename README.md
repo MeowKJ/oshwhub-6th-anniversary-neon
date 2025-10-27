@@ -25,16 +25,16 @@
 ## 📸 Gallery | 成品展示
 
 ### Design Render | 设计图
-![Neon Sign Design](https://image.lceda.cn/oshwhub/pullImage/ebeab3d752f1420fb357e1edb69743a9.png)
+![Neon Sign Design](https://github.com/user-attachments/assets/50771c36-d1a5-4a51-938a-f667a2ceaff2)
 
 ### Assembled Light Board | 灯板成品
-![Neon Lit](https://image.lceda.cn/oshwhub/pullImage/a26465bdb91a4994bbe34f0ef45d0d5f.jpg)
+![Neon Lit](https://github.com/user-attachments/assets/b0a0493e-43c7-4afd-8e4a-069d3fb4e237)
 
 ### PCB with Color Silkscreen | PCB（嘉立创彩色丝印工艺）
-![PCB Front](https://image.lceda.cn/oshwhub/pullImage/9eb9fa04af1e465c85296e8ed7e76ef2.jpeg)
+![PCB Front](https://github.com/user-attachments/assets/4093b901-742e-4fa7-ab89-e4b497473043)
 
 ### Board Testing | 板上点亮测试
-![Board Test](https://image.lceda.cn/oshwhub/pullImage/4d973e79349548e68580c6892ade1854.jpg)
+![Board Test](https://github.com/user-attachments/assets/5022bae9-4e6e-49cc-99ce-c5bddfb4408b)
 
 ---
 
