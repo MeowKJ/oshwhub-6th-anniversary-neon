@@ -1,54 +1,18 @@
 #include <Arduino.h>
 
-const uint8_t LED_PINS[] = {1, 6, 21, 20, 0, 10, 5, 7};
-constexpr uint8_t LED_COUNT = sizeof(LED_PINS) / sizeof(LED_PINS[0]);
+#include "led.h"
+#include "adc.h"
+#include "wifi_ap.h"
 
 #define STATUS_LED_PIN 8 // 状态指示LED
-#define BUTTON_PIN 9
 
-// ===================== 状态变量 =====================
-bool allLEDsOn = false;
-bool lastButtonState = HIGH;
-bool buttonState = HIGH;
-unsigned long lastDebounceTime = 0;
-constexpr unsigned long DEBOUNCE_DELAY = 50; // 消抖延迟50ms
+// 8, 9其实连接到CH224Q IIC接口，懒得去读CH224Q了
+// 不知道为什么开开关会导致CH224Q烧毁
 
-// ===================== LED控制 =====================
-void setAllLEDs(const bool state)
-{
-  for (const unsigned char i : LED_PINS)
-  {
-    digitalWrite(i, state ? HIGH : LOW);
-  }
-}
-
-void ledAnimationSequence(bool state)
-{
-  if (state)
-  // 每次只亮一个，最终全亮
-  {
-    for (uint8_t i = 0; i < LED_COUNT - 1; i++)
-    {
-      setAllLEDs(false);
-      digitalWrite(LED_PINS[i], HIGH);
-      delay(800);
-    }
-    setAllLEDs(false);
-  }
-}
-
-// 按位设置LED（保留原功能）
-void setLEDsByBits(uint8_t value)
-{
-  for (uint8_t i = 0; i < LED_COUNT; i++)
-  {
-    digitalWrite(LED_PINS[i], (value & (1 << i)) ? HIGH : LOW);
-  }
-}
-
-// ===================== 初始化 =====================
 void setup()
 {
+  LED_setup();
+
   Serial.begin(115200);
 
   // 等待USB CDC连接（最多3秒）
@@ -58,54 +22,60 @@ void setup()
     delay(100);
   }
 
-  Serial.println("\n\n=== ESP32-C3 LED Control & ADC Monitor Started ===");
-
-  // 初始化所有LED引脚
-  for (const unsigned char i : LED_PINS)
-  {
-    pinMode(i, OUTPUT);
-    digitalWrite(i, LOW);
-  }
-
   pinMode(STATUS_LED_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(9, INPUT);
+
+  // 检测ADC
+  ADC_setup();
+  float adc1_voltage = 0.0f;
+  float adc2_voltage = 0.0f;
+  ADC_getVoltages(&adc1_voltage, &adc2_voltage);
+
+  printf("=== System Initialized ===\n");
+  printf("ADC1 Voltage: %.3f V\n", adc1_voltage);
+  printf("ADC2 Voltage: %.3f V\n", adc2_voltage);
+  printf("==========================\n\n");
+
+  // 快速闪烁指示错误
+  while (adc1_voltage < 11.0f || adc2_voltage < 12.0f)
+  {
+    ADC_getVoltages(&adc1_voltage, &adc2_voltage);
+    printf("Error: ADC1 Voltage: %.3f V, ADC2 Voltage: %.3f V\n", adc1_voltage, adc2_voltage);
+    digitalWrite(STATUS_LED_PIN, HIGH);
+    delay(200);
+    digitalWrite(STATUS_LED_PIN, LOW);
+    delay(200);
+  }
   digitalWrite(STATUS_LED_PIN, LOW);
+
+  // 正常启动动画
+  delay(1000);
+  Serial.println("=== Playing Startup Animation ===");
+  LED_startupAnimation();
+  delay(1000);
+
+  Serial.println("\n=== Starting WiFi AP ===");
+  WiFiAP_setup();
+  Serial.println("========================\n");
 }
 
 // ===================== 主循环 =====================
 void loop()
 {
-  // ===== 按钮处理（消抖） =====
-  const bool reading = digitalRead(BUTTON_PIN);
+  // 处理WiFi和Web请求
+  WiFiAP_loop();
 
-  if (reading != lastButtonState)
+  // 定期输出ADC电压
+  static unsigned long lastAdcCheck = 0;
+  if (millis() - lastAdcCheck >= 5000)
   {
-    lastDebounceTime = millis();
+    float adc1_voltage = 0.0f;
+    float adc2_voltage = 0.0f;
+    ADC_getVoltages(&adc1_voltage, &adc2_voltage);
+    printf("ADC1 Voltage: %.3f V, ADC2 Voltage: %.3f V\n", adc1_voltage, adc2_voltage);
+    printf("LED Status Bits: 0x%02X\n", ledStateBits);
+    lastAdcCheck = millis();
   }
 
-  if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY)
-  {
-    if (reading != buttonState)
-    {
-      buttonState = reading;
-
-      if (buttonState == LOW)
-      {
-        allLEDsOn = !allLEDsOn;
-        if (allLEDsOn)
-        {
-          ledAnimationSequence(true);
-          delay(800);
-        }
-        setAllLEDs(allLEDsOn);
-        digitalWrite(STATUS_LED_PIN, allLEDsOn);
-
-        Serial.print(">>> Button pressed! LEDs toggled: ");
-        Serial.println(allLEDsOn ? "ON" : "OFF");
-        Serial.println();
-      }
-    }
-  }
-  lastButtonState = reading;
   delay(10);
 }
