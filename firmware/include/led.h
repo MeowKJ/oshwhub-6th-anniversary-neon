@@ -17,9 +17,15 @@ void LED_animationUpdate(uint8_t mode);
 
 //LED动画列表
 void LED_animationSequence(uint32_t interval);
-
+void LED_animationBlink(uint32_t interval);
+void LED_animationRandom(uint32_t interval);
+void LED_animationBreathing(uint32_t interval);
+void LED_animationWave(uint32_t interval);
+void LED_animationChase(uint32_t interval);
+void LED_animation6Blink(uint32_t interval);
 
 //堵塞动画
 void LED_startupAnimation();
+
 
 #endif // LED_H

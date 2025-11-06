@@ -16,11 +16,11 @@ void setup()
   Serial.begin(115200);
 
   // 等待USB CDC连接（最多3秒）
-  const unsigned long startTime = millis();
-  while (!Serial && (millis() - startTime < 3000))
-  {
-    delay(100);
-  }
+  // const unsigned long startTime = millis();
+  // while (!Serial && (millis() - startTime < 3000))
+  // {
+  //   delay(100);
+  // }
 
   pinMode(STATUS_LED_PIN, OUTPUT);
   pinMode(9, INPUT);
@@ -49,6 +49,8 @@ void setup()
   digitalWrite(STATUS_LED_PIN, LOW);
 
   // 正常启动动画
+  // ledStateBits = 0xFF;
+  // LED_Update();
   delay(1000);
   Serial.println("=== Playing Startup Animation ===");
   LED_startupAnimation();
@@ -66,12 +68,17 @@ void loop()
   WiFiAP_loop();
 
   // 定期输出ADC电压
+  // 定期输出ADC电压
   static unsigned long lastAdcCheck = 0;
-  if (millis() - lastAdcCheck >= 5000)
+  if (millis() - lastAdcCheck >= 2000) // 改为2秒更新一次，与网页刷新同步
   {
     float adc1_voltage = 0.0f;
     float adc2_voltage = 0.0f;
     ADC_getVoltages(&adc1_voltage, &adc2_voltage);
+
+    // 更新WiFi模块的电压缓存
+    WiFiAP_updateVoltages(adc1_voltage, adc2_voltage);
+
     printf("ADC1 Voltage: %.3f V, ADC2 Voltage: %.3f V\n", adc1_voltage, adc2_voltage);
     printf("LED Status Bits: 0x%02X\n", ledStateBits);
     lastAdcCheck = millis();

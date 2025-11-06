@@ -42,4 +42,13 @@ void WiFiAP_setAnimationMode(uint8_t mode);
  */
 uint8_t WiFiAP_getAnimationMode();
 
+
+/**
+ * @brief 更新ADC电压值
+ * 
+ * @param voltage1 ADC1电压值
+ * @param voltage2 ADC2电压值
+ */
+void WiFiAP_updateVoltages(float voltage1, float voltage2);
+
 #endif // WIFI_AP_H
